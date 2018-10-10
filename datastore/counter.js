@@ -41,16 +41,16 @@ const writeCounter = (count, callback) => {
 exports.getNextUniqueId = (cb) => {
   readCounter(function(err, data) {
     if (err) {
-      console.log('read err : ', err);
+      //console.log('read err : ', err);
       cb(err, null);
     } else {
         //return (counter = data + 1);
       writeCounter(++data, function(err, data) {
         if (err) {
-          console.log('write err : ', err);
+         // console.log('write err : ', err);
           cb(err, null);
         } else {
-          console.log('writeCounter: ', data);
+         // console.log('writeCounter: ', data);
           cb(null, data);
             //return zeroPaddedNumber(counter);
         }
