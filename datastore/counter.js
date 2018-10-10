@@ -38,24 +38,35 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  readCounter( function(err, data) {
+exports.getNextUniqueId = (cb) => {
+  readCounter(function(err, data) {
     if (err) {
       console.log('read err : ', err);
+      cb(err, null);
     } else {
-      return (counter = data + 1);
+        //return (counter = data + 1);
+      writeCounter(++data, function(err, data) {
+        if (err) {
+          console.log('write err : ', err);
+          cb(err, null);
+        } else {
+          console.log('writeCounter: ', data);
+          cb(null, data);
+            //return zeroPaddedNumber(counter);
+        }
+      });
     }
   });
-  writeCounter(counter, function(err, data) {
-    if (err) {
-      console.log('write err : ', err);
-    } else {
-      console.log(data);
-    }
-  });
-  return zeroPaddedNumber(counter);
 };
-
+// exports.getNextUniqueId = (callBack) => {
+//   readCounter((err, data) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       writeCounter(++data, callBack);
+//     }
+//   });
+// };
 
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
