@@ -2,8 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+const promise = require('bluebird');
 
 var items = {};
+var readFile = promise.promisify(fs.readFile);
+var readdir = promise.promisify(fs.readdir);
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 // fs.writeFile(exports.counterFile, counterString, (err) => {
@@ -30,19 +33,30 @@ exports.create = (text, callback) => {
 
 exports.readAll = (callback) => {
   var data = [];
-  fs.readdir(path.join(__dirname, 'data'), 'utf8', function (err, files) {
-    if (err) {
-      callback(err, null);
-    } else {
-      if (!files.length) {
-        return files;
-      }
-      _.each(files, (id) => {
-        data.push({ id, text: id });
+  readdir(path.join(__dirname, 'data'), 'utf8').then(function(files) {
+    console.log(files);
+    return files;
+  }).then(function(result) {
+    _.each(result, (id) => {
+      // console.log(id);
+      // data.push({ id, text: result });
+      readFile(path.join(__dirname, 'data', id), 'utf8').then( (text) => {
+        console.log('text :', text);
+        data.push({ id, text});
+        console.log('data :', data);
       });
-      callback(null, data);
-    }   
+    });
+  }).then(function() {
+    console.log('whats data here?', data);
+    callback(null, data);
   });
+      //create a new promise for each file
+  //     _.each(files, (id) => {
+  //       data.push({ id, text: id });
+  //     });
+  //     callback(null, data);
+  //   }   
+  // });
 };
 
 exports.readOne = (id, callback) => {

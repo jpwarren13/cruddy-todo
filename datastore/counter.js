@@ -40,7 +40,7 @@ const writeCounter = (count, callback) => {
 
 exports.getNextUniqueId = (cb) => {
   readCounter(function(err, data) {
-    if (err) {
+    if (err) {                                                                                                                                                                                                                               
       //console.log('read err : ', err);
       cb(err, null);
     } else {
@@ -68,7 +68,7 @@ exports.getNextUniqueId = (cb) => {
 //   });
 // };
 
-
+                                        
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
 
 exports.counterFile = path.join(__dirname, 'counter.txt');
