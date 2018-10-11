@@ -4,9 +4,7 @@ const _ = require('underscore');
 const counter = require('./counter');
 const promise = require('bluebird');
 
-var items = {};
 var readFile = promise.promisify(fs.readFile);
-var readdir = promise.promisify(fs.readdir);
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 // fs.writeFile(exports.counterFile, counterString, (err) => {
@@ -32,24 +30,36 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var data = [];
-  readdir(path.join(__dirname, 'data'), 'utf8').then(function(files) {
-    console.log(files);
-    return files;
-  }).then(function(result) {
-    _.each(result, (id) => {
-      // console.log(id);
-      // data.push({ id, text: result });
-      readFile(path.join(__dirname, 'data', id), 'utf8').then( (text) => {
-        console.log('text :', text);
-        data.push({ id, text});
-        console.log('data :', data);
+  fs.readdir(path.join(__dirname, 'data'), 'utf8', (err, files) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      const messages = files.map((file) => {
+        return readFile(path.join(__dirname, 'data', file), 'utf8').then(data => {
+          return {id: file, text: data.toString()};
+        });
       });
-    });
-  }).then(function() {
-    console.log('whats data here?', data);
-    callback(null, data);
-  });
+      promise.all(messages).then((messages) => callback(null, messages));
+    }
+  }
+);
+};
+  //   console.log(files);
+  //   return files;
+  // }).then(function(result) {
+  //   _.each(result, (id) => {
+  //     // console.log(id);
+  //     // data.push({ id, text: result });
+  //     readFile(path.join(__dirname, 'data', id), 'utf8').then( (text) => {
+  //       console.log('text :', text);
+  //       data.push({ id, text});
+  //       console.log('data :', data);
+  //     });
+  //   });
+  // }).then(function() {
+  //   console.log('whats data here?', data);
+  //   callback(null, data);
+  // });
       //create a new promise for each file
   //     _.each(files, (id) => {
   //       data.push({ id, text: id });
@@ -57,7 +67,6 @@ exports.readAll = (callback) => {
   //     callback(null, data);
   //   }   
   // });
-};
 
 exports.readOne = (id, callback) => {
   //var text = items[id];
